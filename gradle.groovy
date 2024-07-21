@@ -1,35 +1,52 @@
-job('example') {
-    // Configure log rotation to keep the last 10 builds
-    logRotator(-1, 10)
-    
-    // Use Java 8 JDK
-    jdk('Java 17')
-    
-    // Configure SCM to checkout the repository from GitHub
-    scm {
-        git("git@github.com:Ach712/gradle.git", 'main') // Change to your repository and branch
-    }
-    
-    // Set up a trigger to build on every push to GitHub
-    triggers {
-        scm('* * * * * ')
-    }
-    
-    // Define the steps to build and run the project
-    steps {
-        gradle {
-            tasks('clean build') // Build the project using Gradle
-            switches('--no-daemon') // Optional: Add any Gradle switches if needed
-            useWrapper(true) // Use Gradle wrapper
-        }
-        
-        // Add a shell step to run the project
-        shell('chmod +x ./gradlew && ./gradlew run')
-    }
-    
-    // Configure post-build actions
-    publishers {
-        // Archive the built JAR file(s)
-        archiveArtifacts('build/libs/*.jar')
-    }
+import jenkins.model.*
+import hudson.model.*
+import hudson.tasks.*
+import hudson.plugins.git.*
+import hudson.plugins.gradle.*
+
+def jobName = "example"
+def repoUrl = "https://github.com/Ach712/gradle.git"
+def branch = "main"
+
+def job = Jenkins.instance.createProject(FreeStyleProject, jobName)
+
+// General configuration
+job.description = "Freestyle project for building a Gradle project"
+job.setDisplayName(jobName)
+
+// GitHub project URL without .git
+job.setProperty(new hudson.model.ParametersDefinitionProperty(new hudson.model.StringParameterDefinition('GITHUB_PROJECT_URL', repoUrl - '.git')))
+
+// Source Code Management
+def scm = new GitSCM(repoUrl)
+scm.branches = [new BranchSpec(branch)]
+job.scm = scm
+
+// Build Triggers
+def scmTrigger = new SCMTrigger('* * * * *')
+job.addTrigger(scmTrigger)
+
+// Build Steps - Invoke Gradle
+def gradle = new Gradle()
+gradle.tasks = 'clean build'
+gradle.useWrapper = true
+job.buildersList.add(gradle)
+
+// Build Steps - Execute shell (for Unix-like systems) or batch command (for Windows)
+if (System.getProperty('os.name').toLowerCase().contains('windows')) {
+    def batchCommand = new BatchFile('gradlew.bat run')
+    job.buildersList.add(batchCommand)
+} else {
+    def shellCommand = new Shell('chmod +x ./gradlew && ./gradlew run')
+    job.buildersList.add(shellCommand)
 }
+
+// Post-build Actions - Archive the artifacts
+def artifactArchiver = new ArtifactArchiver('build/libs/*.jar')
+job.publishersList.add(artifactArchiver)
+
+// Save the job configuration
+job.save()
+
+// Trigger a build
+job.scheduleBuild2(0)
