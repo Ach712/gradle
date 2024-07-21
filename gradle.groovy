@@ -15,10 +15,7 @@ job('example') {
 
     // Define the steps to build and run the project
     steps {
-        gradle {
-            useWorkspaceAsHome(true)
-            rootBuildScriptDir('Gradle_My')
-            tasks('build run')
-        }
+        batchFile('gradle build')
+        batchFile('gradle run')
     }
 }
