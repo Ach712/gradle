@@ -7,10 +7,6 @@ job('example') {
     logRotator {
         numToKeep(10)
     }
-    
-    // Use Java 17 JDK
-    jdk('Java 17')
-    
     // Configure SCM to checkout the repository from GitHub
     scm {
         git {
