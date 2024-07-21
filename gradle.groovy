@@ -3,7 +3,7 @@ job('example') {
     logRotator(-1, 10)
     
     // Use Java 8 JDK
-    jdk('Java 8')
+    jdk('Java 17')
     
     // Configure SCM to checkout the repository from GitHub
     scm {
