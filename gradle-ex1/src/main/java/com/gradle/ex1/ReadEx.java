@@ -11,7 +11,7 @@ public class ReadEx {
     public static void main(String[] args) {
         JSONParser parser = new JSONParser();
 
-        try (FileReader reader = new FileReader("D:/devops/gradle-ex1/src/resources/emp.json")) {
+        try (FileReader reader = new FileReader("src/main/resources/emp.json")) {
             // Read JSON file
             Object obj = parser.parse(reader);
             JSONObject jsonObject = (JSONObject) obj;
@@ -24,4 +24,3 @@ public class ReadEx {
         }
     }
 }
-
