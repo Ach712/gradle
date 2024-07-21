@@ -18,8 +18,7 @@ job('example') {
         gradle {
             useWorkspaceAsHome(true)
             rootBuildScriptDir('Gradle_My')
-            tasks('clean build run')
-            switches('--no-daemon')
+            tasks('build run')
         }
     }
 }
