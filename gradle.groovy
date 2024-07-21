@@ -9,7 +9,7 @@ job('example') {
             remote {
                 url('https://github.com/Ach712/gradle.git')
             }
-            branch('main')
+            branch('*/main')
         }
     }
 
